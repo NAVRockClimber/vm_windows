@@ -46,6 +46,7 @@ resource "azurerm_subnet" "subnet" {
 
 resource "azurerm_public_ip" "publicip" {
     name                         = "${local.name_prefix}-PublicIP"
+    domain_name_label             = "${local.name_prefix}-vm"
     location                     = azurerm_resource_group.rg.location
     resource_group_name          = azurerm_resource_group.rg.name
     allocation_method            = "Dynamic"
