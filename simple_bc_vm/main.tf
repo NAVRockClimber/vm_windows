@@ -108,21 +108,22 @@ resource "azurerm_network_interface_security_group_association" "example" {
 
 ## <https://www.terraform.io/docs/providers/azurerm/r/network_interface.html>
 resource "azurerm_network_interface" "example" {
-  name                = "${local.name_prefix}-nic"
+  name                = "${local.name_prefix}-nic-${local.name_suffix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnet.id
-    private_ip_address_allocation = "Static"
+    private_ip_address_allocation = "Dynamic"
     public_ip_address_id = azurerm_public_ip.publicip.id
   }
 }
 
 ## <https://www.terraform.io/docs/providers/azurerm/r/windows_virtual_machine.html>
 resource "azurerm_windows_virtual_machine" "example" {
-  name                = "${local.name_prefix}-vm"
+  name                = "${local.name_prefix}-vm-${local.name_suffix}"
+  computer_name       = "${local.name_prefix}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   size                = var.VmSettings.size
@@ -143,4 +144,28 @@ resource "azurerm_windows_virtual_machine" "example" {
     sku       = "2019-Datacenter"
     version   = "latest"
   }
+}
+
+resource "azurerm_virtual_machine_extension" "initVM" {
+  name                       = "initvm"
+  virtual_machine_id         = azurerm_windows_virtual_machine.example.id
+  publisher                  = "Microsoft.Compute"
+  type                       = "CustomScriptExtension"
+  type_handler_version       = "1.10"
+  auto_upgrade_minor_version = true
+
+  settings = <<SETTINGS
+    {
+      "fileUris": [
+        "https://community.chocolatey.org/install.ps1"
+      ]
+    }
+  SETTINGS
+
+  protected_settings = <<PROTECTED_SETTINGS
+    {
+      "commandToExecute": "powershell.exe -Command \"./chocolatey.ps1; exit 0;\""
+    }
+  PROTECTED_SETTINGS
+
 }
