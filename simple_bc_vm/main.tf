@@ -26,6 +26,10 @@ output "password" {
   sensitive = true
 }
 
+output "ssh-to-jumpbox" {
+  value = "ssh -l ${var.adminUsername} ${azurerm_public_ip.publicip.fqdn}"
+}
+
 resource "random_string" "name" {
   length  = 8
   special = false
@@ -93,7 +97,7 @@ resource "azurerm_network_security_rule" "rdp" {
   resource_group_name         = azurerm_resource_group.rg.name
   priority                    = 310
   direction                   = "Inbound"
-  access                      = "Deny"
+  access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "3389"
@@ -164,7 +168,7 @@ resource "azurerm_virtual_machine_extension" "initVM" {
 
   protected_settings = <<PROTECTED_SETTINGS
     {
-      "commandToExecute": "powershell.exe -Command \"./chocolatey.ps1; exit 0;\""
+      "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -command ./install.ps1; choco install openssh -y -params '/SSHServerFeature'"
     }
   PROTECTED_SETTINGS
 
