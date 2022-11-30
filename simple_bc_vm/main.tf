@@ -33,7 +33,7 @@ output "ssh-to-jumpbox" {
 resource "random_string" "name" {
   length  = 8
   special = false
-  number  = false
+  numeric  = false
   upper   = false
 }
 
