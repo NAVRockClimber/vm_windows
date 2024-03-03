@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    ansible = {
+      source  = "ansible/ansible"
+      version = "~> 1.1.0"
+    }
+  }
+}
+
 ## <https://www.terraform.io/docs/providers/azurerm/index.html>
 provider "azurerm" {
   features {}
