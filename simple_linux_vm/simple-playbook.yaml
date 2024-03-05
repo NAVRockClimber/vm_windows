@@ -1,6 +1,6 @@
 ---
 - name: Install nginx on remote host
-  hosts: nginx
+  hosts: all
   become: true
   gather_facts: false
   tasks:
